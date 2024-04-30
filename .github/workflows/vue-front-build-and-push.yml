@@ -1,0 +1,35 @@
+name : Vue Front Build and Push
+# 1. 이벤트 트리거 (on)
+on :
+  push :
+    branches : [main]
+# 2. jobs - runner
+jobs :
+  build :
+    runs-on : ubuntu-latest
+# 3. source checkout
+    steps :
+    - name : Source Checkout
+      uses : actions/checkout@v2
+# 4. setup node
+    - name : Setup Node
+      uses : actions/setup-node@v2
+# 5. docker build
+    - name : Docker buildx
+      uses : docker/setup-buildx-action@v2
+# 6. docker login
+    - name : Docker Login
+      uses : docker/login-action@v2
+      with :
+        username : ${{ secrets.DOCKERHUB_USERNAME }}
+        password : ${{ secrets.DOCKERHUB_TOKEN }}
+# 7. docker build and push
+    - name : Docker push
+      uses : docker/build-push-action@v2
+      with :
+        context : ./
+        file : ./Dockerfile
+        push : true
+        tags : ${{ secrets.DOCKERHUB_USERNAME }}/frontend-vue-pjt:${{github.sha}}
+# 파이프라인 작성이 끝나면 docker hub에 있는 image를 pulling하는
+# image download 하기?
